@@ -24,6 +24,9 @@ import android.widget.Toast;
 
 import com.example.rockpaperscissors.R;
 import com.mcgrath.rockpaperscissors.database.UserDatabaseHelper;
+import com.mcgrath.rockpaperscissors.events.BtDeviceFoundEvent;
+import com.mcgrath.rockpaperscissors.events.BtDeviceSelectedEvent;
+import com.mcgrath.rockpaperscissors.events.BtEnabledEvent;
 import com.mcgrath.rockpaperscissors.events.LoadUserEvent;
 import com.mcgrath.rockpaperscissors.events.PlayAgainEvent;
 import com.mcgrath.rockpaperscissors.events.SaveUserInfoEvent;
@@ -55,7 +58,8 @@ public class CentralActivity extends FragmentActivity
 	{
 		USER_INPUT,
 		GAME,
-		RESULT
+		RESULT,
+		BLUETOOTH
 	}
 	
 	@Override
@@ -72,16 +76,10 @@ public class CentralActivity extends FragmentActivity
 			mUser = savedInstanceState.getParcelable("user");
 		}
 
+		MY_UUID = new UUID( 10203, 34323 );
 		mDBHelper = new UserDatabaseHelper( this );
         EventBus.getDefault().register( this );
-        
-        blootoof();
-        if(mBluetoothAdapter != null)
-        {
-        	setupBtFoundReciever();
-        	mBluetoothAdapter.startDiscovery();
-        }
-        
+               
 	}
 
 	@Override
@@ -92,15 +90,20 @@ public class CentralActivity extends FragmentActivity
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+	
+	    switch (item.getItemId())
+	    {
+        case R.id.action_multiplayer:
+            switchFrag(getFrag(Pages.BLUETOOTH));
+            return true;
+        case R.id.action_settings:
+            //showHelp();
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+	    }
 	}
 	
 	private void switchFrag( Fragment aFragment )
@@ -128,6 +131,9 @@ public class CentralActivity extends FragmentActivity
 			theBundlee.putChar("move", mUsersMoveCode );
 			Fragment theResultFrag = (Fragment)ResultFragment.newInstance( theBundlee );
 			return theResultFrag;
+		case BLUETOOTH:
+			Fragment theBtFrag = (Fragment)BlueToothFragment.newInstance( new Bundle() );
+			return theBtFrag;
 		}
 		return null;
 	}
@@ -168,6 +174,12 @@ public class CentralActivity extends FragmentActivity
 			mDBHelper.updateUserWins( mDBHelper.getWritableDatabase(), mUser );
 		}
 	}
+	
+	public void onEventMainThread( BtDeviceSelectedEvent aEvent )
+	{
+		mDevice = aEvent.mDevice;
+		startClient();
+	}
 
 	@Override
 	protected void onDestroy()
@@ -182,16 +194,17 @@ public class CentralActivity extends FragmentActivity
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (mBluetoothAdapter == null) 
 		{
-		    // Device does not support Bluetooth
+		    return;
 		}
 		
 		
 		if (!mBluetoothAdapter.isEnabled())
 		{
-		    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-		    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+		    Intent enableBtIntent = new Intent( BluetoothAdapter.ACTION_REQUEST_ENABLE );
+		    startActivityForResult( enableBtIntent, REQUEST_ENABLE_BT );
 		}
-		
+		setupBtFoundReciever();
+		mBluetoothAdapter.startDiscovery();
 		
 	}
 
@@ -200,7 +213,8 @@ public class CentralActivity extends FragmentActivity
 	{
 		if( arg0 == REQUEST_ENABLE_BT  &&  arg1 == RESULT_OK )
 		{
-			Toast.makeText( this, "Fuck yeah BT", Toast.LENGTH_SHORT).show();
+			Toast.makeText( this, "Heck yeah BT", Toast.LENGTH_SHORT).show();
+			EventBus.getDefault().post(new BtEnabledEvent(true));
 		}
 		else
 		{
@@ -211,20 +225,16 @@ public class CentralActivity extends FragmentActivity
 	
     public void setupBtFoundReciever()
     {
-     // Create a BroadcastReceiver for ACTION_FOUND
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent)
             {
                 String action = intent.getAction();
-                // When discovery finds a device
                 if (BluetoothDevice.ACTION_FOUND.equals(action))
                 {
-                    // Get the BluetoothDevice object from the Intent
-                    mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    makeToast( "Found " + mDevice.getName() );
-                    // Add the name and address to an array adapter to show in a ListView
-                  //  mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+                    BluetoothDevice aDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    makeToast( "Found " + aDevice.getName() );
+                    EventBus.getDefault().post( new BtDeviceFoundEvent(aDevice));
                 }
             }
         };
