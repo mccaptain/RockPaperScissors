@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
@@ -81,6 +82,25 @@ public class CentralActivity extends FragmentActivity
 		mDBHelper = new UserDatabaseHelper( this );
         EventBus.getDefault().register( this );
                
+        mHandler = new Handler()
+        {
+            @Override
+            public void handleMessage(Message msg)
+            {
+                switch(msg.what)
+                {
+                    case MESSAGE_READ:
+                        byte[] readBuf = (byte[]) msg.obj;
+
+                        // construct a string from the valid bytes in the buffer.
+                        String readMessage = new String(readBuf, 0, msg.arg1);
+                        Toast.makeText(CentralActivity.this, readMessage, Toast.LENGTH_SHORT).show();
+                        break;
+
+                }
+            }
+        };
+        
 	}
 
 	@Override
