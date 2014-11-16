@@ -17,34 +17,15 @@
         <Button 
         	android:layout_width="wrap_content"
         	android:layout_height="80dp"
-        	android:id="@+id/enable_button"
-        	android:text="ENABLE BT"/>
+        	android:id="@+id/single_button"
+        	android:text="Single Player"/>
     
 	    <Button 
 	        android:layout_width="wrap_content"
 	        android:layout_height="80dp"
-	        android:id="@+id/search_button"
-	        android:text="SEARCH"/>
+	        android:id="@+id/multi_button"
+	        android:text="MultiPlayer"/>
     </LinearLayout>
 
-        
-    <ListView 
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:id="@+id/btconnection_list"
-        android:background="@color/abc_search_url_text_normal">"
-    </ListView>
-    
-    <Button 
-        android:layout_width="wrap_content"
-        android:layout_height="80dp"
-        android:id="@+id/connect_button"
-        android:text="CONNECT"/>
-    
-    <Button 
-        android:layout_width="wrap_content"
-        android:layout_height="80dp"
-        android:id="@+id/server_button"
-        android:text="START SERVER"/>
 
 </LinearLayout>

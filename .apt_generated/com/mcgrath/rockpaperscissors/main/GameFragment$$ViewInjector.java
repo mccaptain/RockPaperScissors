@@ -7,23 +7,23 @@ import butterknife.ButterKnife.Finder;
 public class GameFragment$$ViewInjector {
   public static void inject(Finder finder, final com.mcgrath.rockpaperscissors.main.GameFragment target, Object source) {
     View view;
-    view = finder.findRequiredView(source, 2131034182, "field 'mUserEntryLabel'");
+    view = finder.findRequiredView(source, 2131034184, "field 'mUserEntryLabel'");
     target.mUserEntryLabel = (android.widget.TextView) view;
-    view = finder.findRequiredView(source, 2131034181, "field 'mUserNameLabel'");
-    target.mUserNameLabel = (android.widget.TextView) view;
-    view = finder.findRequiredView(source, 2131034184, "field 'mWheel'");
+    view = finder.findRequiredView(source, 2131034186, "field 'mWheel'");
     target.mWheel = (com.anupcowkur.wheelmenu.WheelMenu) view;
-    view = finder.findRequiredView(source, 2131034183, "field 'mPlayButton'");
+    view = finder.findRequiredView(source, 2131034185, "field 'mPlayButton'");
     target.mPlayButton = (android.widget.Button) view;
-    view = finder.findRequiredView(source, 2131034180, "field 'mAvatarImage'");
+    view = finder.findRequiredView(source, 2131034183, "field 'mUserNameLabel'");
+    target.mUserNameLabel = (android.widget.TextView) view;
+    view = finder.findRequiredView(source, 2131034182, "field 'mAvatarImage'");
     target.mAvatarImage = (android.widget.ImageView) view;
   }
 
   public static void reset(com.mcgrath.rockpaperscissors.main.GameFragment target) {
     target.mUserEntryLabel = null;
-    target.mUserNameLabel = null;
     target.mWheel = null;
     target.mPlayButton = null;
+    target.mUserNameLabel = null;
     target.mAvatarImage = null;
   }
 }

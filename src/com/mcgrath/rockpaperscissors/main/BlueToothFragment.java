@@ -91,16 +91,16 @@ public class BlueToothFragment extends Fragment
 			@Override
 			public void onClick(View v)
 			{
-				if( mBtStarted )
-				{
+//				if( mBtStarted )
+//				{
 					CentralActivity theCA = (CentralActivity)getActivity();
 				
 					theCA.startSearch();
-				}
-				else
-				{
-					Toast.makeText(getActivity(), "Enable BT", Toast.LENGTH_SHORT ).show();
-				}
+//				}
+//				else
+//				{
+//					Toast.makeText(getActivity(), "Enable BT", Toast.LENGTH_SHORT ).show();
+//				}
 			}
 		});
         
@@ -110,16 +110,16 @@ public class BlueToothFragment extends Fragment
 			@Override
 			public void onClick(View v)
 			{
-				if( mBtStarted )
-				{
+//				if( mBtStarted )
+//				{
 					CentralActivity theCA = (CentralActivity)getActivity();
 				
 					theCA.startServer();
-				}
-				else
-				{
-					Toast.makeText(getActivity(), "Enable BT", Toast.LENGTH_SHORT ).show();
-				}
+//				}
+//				else
+//				{
+//					Toast.makeText(getActivity(), "Enable BT", Toast.LENGTH_SHORT ).show();
+//				}
 			}
 		});
         
@@ -129,7 +129,7 @@ public class BlueToothFragment extends Fragment
 			@Override
 			public void onClick(View v)
 			{
-				if( mBtStarted && mSelecteDevice != null )
+				if( mSelecteDevice != null )
 				{
 					CentralActivity theCA = (CentralActivity)getActivity();
 				
