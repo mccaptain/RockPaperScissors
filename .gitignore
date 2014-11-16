@@ -1,3 +1,4 @@
 bin/
 *.class
 .apt_generated/
+.settings/
