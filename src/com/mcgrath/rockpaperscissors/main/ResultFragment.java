@@ -42,7 +42,8 @@ public class ResultFragment extends Fragment
 		if( aArgs != null )
 		{
 			theFrag.mUser = (User) aArgs.get("user");
-			theFrag.mUsersMoveCode = aArgs.getChar( "move" );
+			theFrag.mUsersMoveCode = aArgs.getChar( "user_move" );
+			theFrag.mCpuMoveCode = aArgs.getChar( "cpu_move" );
 		}
 		return theFrag;
 	}
@@ -54,8 +55,8 @@ public class ResultFragment extends Fragment
 		if( savedInstanceState != null )
 		{
 			mUser = (User) savedInstanceState.get("user");
-		    mUsersMoveCode = savedInstanceState.getChar("move");
-		    mCpuMoveCode = savedInstanceState.getChar("cpumove");
+		    mUsersMoveCode = savedInstanceState.getChar("user_move");
+		    mCpuMoveCode = savedInstanceState.getChar("cpu_move");
 		}
 		super.onCreate(savedInstanceState);
 	}
@@ -122,8 +123,8 @@ public class ResultFragment extends Fragment
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putParcelable("user", mUser );
-		outState.putChar("move", mUsersMoveCode );
-		outState.putChar("cpumove", mCpuMoveCode );
+		outState.putChar("user_move", mUsersMoveCode );
+		outState.putChar("cpu_move", mCpuMoveCode );
 		super.onSaveInstanceState(outState);
 	}
 	
