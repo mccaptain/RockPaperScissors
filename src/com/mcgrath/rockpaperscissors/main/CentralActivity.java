@@ -53,7 +53,7 @@ public class CentralActivity extends FragmentActivity
     private AcceptThread mServerThread;
     private ConnectThread mClientThread;
     ConnectedThread mConnectedThread;
-    
+    private String readMessage;
 	
 	private enum Pages
 	{
@@ -93,7 +93,7 @@ public class CentralActivity extends FragmentActivity
                         byte[] readBuf = (byte[]) msg.obj;
 
                         // construct a string from the valid bytes in the buffer.
-                        String readMessage = new String(readBuf, 0, msg.arg1);
+                        readMessage = new String(readBuf, 0, msg.arg1);
                         Toast.makeText(CentralActivity.this, readMessage, Toast.LENGTH_SHORT).show();
                         break;
 
@@ -175,7 +175,12 @@ public class CentralActivity extends FragmentActivity
 	public void onEvent( UserPlayEvent aEvent )
 	{
 		//record user stats
+		
 		mUsersMoveCode = aEvent.getMove();
+		sendMessage(mUsersMoveCode.toString().getBytes());
+		while("".equals(readMessage)){
+			
+		}
 		switchFrag( getFrag( Pages.RESULT ) );
 	}
 	
