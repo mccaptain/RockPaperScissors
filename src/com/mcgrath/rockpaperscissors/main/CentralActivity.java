@@ -59,7 +59,8 @@ public class CentralActivity extends FragmentActivity
 		USER_INPUT,
 		GAME,
 		RESULT,
-		BLUETOOTH
+		BLUETOOTH,
+		SETUP
 	}
 	
 	@Override
@@ -92,18 +93,7 @@ public class CentralActivity extends FragmentActivity
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-	
-	    switch (item.getItemId())
-	    {
-        case R.id.action_multiplayer:
-            switchFrag(getFrag(Pages.BLUETOOTH));
-            return true;
-        case R.id.action_settings:
-            //showHelp();
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
-	    }
+       return super.onOptionsItemSelected(item);
 	}
 	
 	private void switchFrag( Fragment aFragment )
@@ -134,6 +124,9 @@ public class CentralActivity extends FragmentActivity
 		case BLUETOOTH:
 			Fragment theBtFrag = (Fragment)BlueToothFragment.newInstance( new Bundle() );
 			return theBtFrag;
+		case SETUP:
+			Fragment theSetupFrag = (Fragment)SetupFragment.newInstance( new Bundle() );
+			return theSetupFrag;		
 		}
 		return null;
 	}
@@ -156,7 +149,7 @@ public class CentralActivity extends FragmentActivity
 	public void onEvent( LoadUserEvent aEvent )
 	{
 		mUser = mDBHelper.getUserWithName( mDBHelper.getReadableDatabase(), aEvent.getUserID() );
-		switchFrag( getFrag( Pages.GAME ) );
+		switchFrag( getFrag( Pages.SETUP ) );
 	}
 	
 	public void onEvent( UserPlayEvent aEvent )
@@ -180,12 +173,20 @@ public class CentralActivity extends FragmentActivity
 		mDevice = aEvent.mDevice;
 		startClient();
 	}
+	
+	public void gotoBluetooth()
+	{
+		switchFrag( getFrag( Pages.BLUETOOTH ));
+	}
 
 	@Override
 	protected void onDestroy()
 	{
 		mDBHelper.close();
-		unregisterReceiver(mReceiver);
+		if( mReceiver != null )
+		{
+			unregisterReceiver(mReceiver);
+		}
 		super.onDestroy();
 	}
 	
