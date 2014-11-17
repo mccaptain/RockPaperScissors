@@ -1,6 +1,8 @@
 package com.mcgrath.rockpaperscissors.main;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
@@ -134,12 +136,16 @@ public class BlueToothFragment extends Fragment
 					CentralActivity theCA = (CentralActivity)getActivity();
 				
 					EventBus.getDefault().post( new BtDeviceSelectedEvent( mSelecteDevice ));
+					
 				}
 				
 				if( mSelecteDevice == null )
 				{
 					Toast.makeText(getActivity(), "Select A Device", Toast.LENGTH_SHORT ).show();
 				}
+				
+				
+				
 			}
 		});
         
@@ -175,11 +181,13 @@ public class BlueToothFragment extends Fragment
 		mDevices.add( aEvent.mDevice );
 		
 		String[] theDs = new String[mDevices.size()];
+		Set<String> deviceSet = new HashSet<String>();
 		for( int i = 0; i < mDevices.size(); i++ )
 		{
 			theDs[i] = mDevices.get(i).getName();
+			deviceSet.add(mDevices.get(i).getName());
 		}
-		mListAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, theDs );
+		mListAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, deviceSet.toArray(new String[deviceSet.size()]) );
 		mConList.setAdapter(mListAdapter);
 		mListAdapter.notifyDataSetChanged();
 		
