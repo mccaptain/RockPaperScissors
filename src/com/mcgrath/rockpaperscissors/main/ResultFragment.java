@@ -43,7 +43,7 @@ public class ResultFragment extends Fragment
 		{
 			theFrag.mUser = (User) aArgs.get("user");
 			theFrag.mUsersMoveCode = aArgs.getChar( "user_move" );
-			theFrag.mCpuMoveCode = aArgs.getChar( "cpu_move" );
+			theFrag.mCpuMoveCode = aArgs.getChar( "cpumove" );
 		}
 		return theFrag;
 	}
@@ -56,7 +56,7 @@ public class ResultFragment extends Fragment
 		{
 			mUser = (User) savedInstanceState.get("user");
 		    mUsersMoveCode = savedInstanceState.getChar("user_move");
-		    mCpuMoveCode = savedInstanceState.getChar("cpu_move");
+		    mCpuMoveCode = savedInstanceState.getChar("cpumove");
 		}
 		super.onCreate(savedInstanceState);
 	}
@@ -67,11 +67,6 @@ public class ResultFragment extends Fragment
 	{
 		 View theView = inflater.inflate(R.layout.result_frag, container, false);
 		 ButterKnife.inject( this, theView );
-	
-		 if( savedInstanceState == null )
-		 {
-			 mCpuMoveCode = decideCPUMove();
-		 }
 		 
 		 mUserName.setText( mUser.getName() );
 
@@ -102,29 +97,11 @@ public class ResultFragment extends Fragment
 		 return theView;
 	}
 	
-	private char decideCPUMove()
-	{
-		 Random theR = new Random();
-		 int theRes = theR.nextInt(3);
-		 
-		 switch(theRes)
-		 {
-			 case 0: //cpu wins 
-				 return 'p';
-				 
-			 case 1: // tie
-				 return 'r';
-				 
-			 default: //user wins
-				 return 's';
-		 }
-	}
-	
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putParcelable("user", mUser );
 		outState.putChar("user_move", mUsersMoveCode );
-		outState.putChar("cpu_move", mCpuMoveCode );
+		outState.putChar("cpumove", mCpuMoveCode );
 		super.onSaveInstanceState(outState);
 	}
 	

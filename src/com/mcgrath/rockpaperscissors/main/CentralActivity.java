@@ -4,6 +4,7 @@ package com.mcgrath.rockpaperscissors.main;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.UUID;
 
 import android.bluetooth.BluetoothAdapter;
@@ -39,6 +40,7 @@ public class CentralActivity extends FragmentActivity
 {
 	private User mUser;
 	private Character mUsersMoveCode;
+	private Character mCPUMoveCode;
 	public UserDatabaseHelper mDBHelper;
 	
     private BluetoothAdapter mBluetoothAdapter;
@@ -47,14 +49,22 @@ public class CentralActivity extends FragmentActivity
     private final int MESSAGE_READ = 256;
     private BroadcastReceiver mReceiver;
     private final String NAME = "TESTING_PLEASE";
-    private UUID MY_UUID;
-    private Handler mHandler;
+    private static final UUID BLUETOOTH_SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+    private static Handler mHandler;
 	
     private AcceptThread mServerThread;
     private ConnectThread mClientThread;
     ConnectedThread mConnectedThread;
-    private String readMessage;
-	
+    
+    
+    //--------messages--------------------
+    private static final int STARTGAME 		= 1;
+    private static final int READY 			= 5;
+    private static final int ROCKMOVE 		= 2;
+    private static final int PAPERMOVE 		= 3;
+    private static final int SCISSORMOVE 	= 4;
+    //--------messages--------------------
+    
 	private enum Pages
 	{
 		USER_INPUT,
@@ -78,7 +88,6 @@ public class CentralActivity extends FragmentActivity
 			mUser = savedInstanceState.getParcelable("user");
 		}
 
-		MY_UUID = new UUID( 10203, 34323 );
 		mDBHelper = new UserDatabaseHelper( this );
         EventBus.getDefault().register( this );
                
@@ -90,11 +99,36 @@ public class CentralActivity extends FragmentActivity
                 switch(msg.what)
                 {
                     case MESSAGE_READ:
-                        byte[] readBuf = (byte[]) msg.obj;
-
-                        // construct a string from the valid bytes in the buffer.
-                        readMessage = new String(readBuf, 0, msg.arg1);
-                        Toast.makeText(CentralActivity.this, readMessage, Toast.LENGTH_SHORT).show();
+                    	int msgCode = 0;
+                    	
+                    	ByteBuffer b = ByteBuffer.wrap((byte[]) msg.obj);
+                    	msgCode = b.getInt();
+                    	
+                    	switch( msgCode )
+                    	{
+                    	case STARTGAME:
+                    		switchFrag(getFrag(Pages.GAME));
+                    		break;
+                    	case READY:
+                    		makeToast("READY");
+                    		break;
+                    	case ROCKMOVE:
+                    		makeToast("ROCKMOVE");
+                    		mCPUMoveCode = 'r';
+                    		break;
+                    	case PAPERMOVE:
+                    		makeToast("PAPERMOVE");
+                    		mCPUMoveCode = 'p';
+                    		break;
+                    	case SCISSORMOVE:
+                    		makeToast("SCISSORMOVE");
+                    		mCPUMoveCode = 's';
+                    		break;
+                		default:
+                			makeToast("bad code");
+                			break;
+                    	}
+                    	
                         break;
 
                 }
@@ -138,7 +172,8 @@ public class CentralActivity extends FragmentActivity
 		case RESULT:
 			Bundle theBundlee = new Bundle();
 			theBundlee.putParcelable("user", mUser);
-			theBundlee.putChar("move", mUsersMoveCode );
+			theBundlee.putChar( "user_move", mUsersMoveCode );
+			theBundlee.putChar( "cpumove", mCPUMoveCode );
 			Fragment theResultFrag = (Fragment)ResultFragment.newInstance( theBundlee );
 			return theResultFrag;
 		case BLUETOOTH:
@@ -177,9 +212,19 @@ public class CentralActivity extends FragmentActivity
 		//record user stats
 		
 		mUsersMoveCode = aEvent.getMove();
-		sendMessage(mUsersMoveCode.toString().getBytes());
-		while("".equals(readMessage)){
-			
+		switch( mUsersMoveCode )
+		{
+		case 'r':
+			sendMessage(getBytes(ROCKMOVE));
+			break;
+		case 'p':
+			sendMessage(getBytes(PAPERMOVE));
+			break;
+		case 's':
+			sendMessage(getBytes(SCISSORMOVE));
+			break;
+		default:
+			break;
 		}
 		switchFrag( getFrag( Pages.RESULT ) );
 	}
@@ -197,6 +242,7 @@ public class CentralActivity extends FragmentActivity
 	{
 		mDevice = aEvent.mDevice;
 		startClient();
+		switchFrag( getFrag( Pages.GAME ) );
 	}
 	
 	public void gotoBluetooth()
@@ -239,7 +285,7 @@ public class CentralActivity extends FragmentActivity
 	{
 		if( arg0 == REQUEST_ENABLE_BT  &&  arg1 == RESULT_OK )
 		{
-			Toast.makeText( this, "Heck yeah BT", Toast.LENGTH_SHORT).show();
+			makeToast( "Heck yeah BT" );
 			EventBus.getDefault().post(new BtEnabledEvent(true));
 		}
 		else
@@ -298,8 +344,16 @@ public class CentralActivity extends FragmentActivity
 
     public void startClient()
     {
-       mClientThread = new ConnectThread( mDevice );
-       mClientThread.start();
+		mClientThread = new ConnectThread( mDevice );
+		mClientThread.start();
+		sendMessage(getBytes(STARTGAME));
+    }
+    
+    byte[] getBytes( int aIn )
+    {
+		ByteBuffer b = ByteBuffer.allocate(4);
+		b.putInt( aIn );
+		return b.array();
     }
     
     public void makeDiscoverable()
@@ -329,7 +383,7 @@ public class CentralActivity extends FragmentActivity
             try 
             {
                 // MY_UUID is the app's UUID string, also used by the client code
-                tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
+                tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(NAME, BLUETOOTH_SPP_UUID);
             } 
             catch (IOException e)
             {
@@ -384,8 +438,7 @@ public class CentralActivity extends FragmentActivity
             }
         }
     }
-    //server code 
-    
+    //server code   
     
     //client code
     private class ConnectThread extends Thread
@@ -404,7 +457,7 @@ public class CentralActivity extends FragmentActivity
             try 
             {
                 // MY_UUID is the app's UUID string, also used by the server code
-                tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
+                tmp = device.createRfcommSocketToServiceRecord(BLUETOOTH_SPP_UUID);
             } 
             catch (IOException e)
             {
