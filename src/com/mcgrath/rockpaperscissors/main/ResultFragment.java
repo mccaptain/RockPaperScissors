@@ -1,5 +1,6 @@
 package com.mcgrath.rockpaperscissors.main;
 
+import java.nio.ByteBuffer;
 import java.util.Random;
 
 import android.os.Bundle;
@@ -124,9 +125,21 @@ public class ResultFragment extends Fragment
 			mResult.setText( getString( R.string.youwin ) );
 			mUser.setWins( mUser.getWins() + 1 );
 		}
+		
+		CentralActivity theCA = (CentralActivity)getActivity();
+		theCA.sendMessage(getBytes(5));
+		
+		
 		 mRecord.setText( "W:" + mUser.getWins() + " L:" + mUser.getLosses() );
 		 
 	}
+	
+	byte[] getBytes( int aIn )
+    {
+		ByteBuffer b = ByteBuffer.allocate(4);
+		b.putInt( aIn );
+		return b.array();
+    }
 	
 	private String getMoveText( char aMove )
 	{

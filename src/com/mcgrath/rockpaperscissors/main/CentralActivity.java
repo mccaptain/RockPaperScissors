@@ -40,7 +40,7 @@ public class CentralActivity extends FragmentActivity
 {
 	private User mUser;
 	private Character mUsersMoveCode;
-	private Character mCPUMoveCode;
+	private Character mCPUMoveCode = 'a';
 	public UserDatabaseHelper mDBHelper;
 	
     private BluetoothAdapter mBluetoothAdapter;
@@ -81,7 +81,7 @@ public class CentralActivity extends FragmentActivity
 		setContentView(R.layout.activity_central);
 		if (savedInstanceState == null)
 		{
-			switchFrag( getFrag( Pages.USER_INPUT ) );
+			switchFrag(  Pages.USER_INPUT  );
 		}
 		else
 		{
@@ -107,10 +107,12 @@ public class CentralActivity extends FragmentActivity
                     	switch( msgCode )
                     	{
                     	case STARTGAME:
-                    		switchFrag(getFrag(Pages.GAME));
+                    		switchFrag(Pages.GAME);
                     		break;
                     	case READY:
                     		makeToast("READY");
+                    		switchFrag(Pages.RESULT);
+                    		
                     		break;
                     	case ROCKMOVE:
                     		makeToast("ROCKMOVE");
@@ -150,11 +152,20 @@ public class CentralActivity extends FragmentActivity
        return super.onOptionsItemSelected(item);
 	}
 	
-	private void switchFrag( Fragment aFragment )
+	private void switchFrag( Pages page )
 	{
-		getSupportFragmentManager().beginTransaction()
-			.replace( R.id.container, aFragment )
+
+		Fragment fragment = getSupportFragmentManager().findFragmentByTag(page.toString());
+		if(fragment == null){
+			getSupportFragmentManager().beginTransaction()
+			.replace( R.id.container, getFrag(page), page.toString())
 			.commit();
+		}
+		else if(fragment != null && !fragment.isVisible()){
+			getSupportFragmentManager().beginTransaction()
+			.replace( R.id.container, getFrag(page), page.toString())
+			.commit();
+		}
 	}
 	
 	private Fragment getFrag( Pages aPage )
@@ -198,13 +209,13 @@ public class CentralActivity extends FragmentActivity
 	{
 		mUser = aEvent.getUser();
 		mDBHelper.saveUser( mDBHelper.getWritableDatabase(), mUser );
-		switchFrag( getFrag( Pages.GAME ) );
+		switchFrag(Pages.GAME);
 	}
 	
 	public void onEvent( LoadUserEvent aEvent )
 	{
 		mUser = mDBHelper.getUserWithName( mDBHelper.getReadableDatabase(), aEvent.getUserID() );
-		switchFrag( getFrag( Pages.SETUP ) );
+		switchFrag(  Pages.SETUP );
 	}
 	
 	public void onEvent( UserPlayEvent aEvent )
@@ -226,12 +237,18 @@ public class CentralActivity extends FragmentActivity
 		default:
 			break;
 		}
-		switchFrag( getFrag( Pages.RESULT ) );
+		
+		if(!mCPUMoveCode.equals('a')){
+			switchFrag( Pages.RESULT );
+		}
+		
+		
 	}
 	
 	public void onEvent( PlayAgainEvent aEvent )
 	{
-		switchFrag( getFrag( Pages.GAME ) );
+		switchFrag(  Pages.GAME );
+		mCPUMoveCode = 'a';
 		if( mUser != null )
 		{
 			mDBHelper.updateUserWins( mDBHelper.getWritableDatabase(), mUser );
@@ -242,12 +259,12 @@ public class CentralActivity extends FragmentActivity
 	{
 		mDevice = aEvent.mDevice;
 		startClient();
-		switchFrag( getFrag( Pages.GAME ) );
+		switchFrag(  Pages.GAME  );
 	}
 	
 	public void gotoBluetooth()
 	{
-		switchFrag( getFrag( Pages.BLUETOOTH ));
+		switchFrag( Pages.BLUETOOTH );
 	}
 
 	@Override
@@ -317,7 +334,7 @@ public class CentralActivity extends FragmentActivity
 	
     public void makeToast( String aString )
     {
-        Toast.makeText( CentralActivity.this, aString, Toast.LENGTH_SHORT ).show();
+        //Toast.makeText( CentralActivity.this, aString, Toast.LENGTH_SHORT ).show();
     }
 	
     public void sendMessage(byte[] aMessage)

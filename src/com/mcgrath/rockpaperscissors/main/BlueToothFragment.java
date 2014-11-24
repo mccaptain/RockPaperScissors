@@ -42,7 +42,7 @@ public class BlueToothFragment extends Fragment
 	@InjectView( R.id.btconnection_list ) ListView mConList;
 	@InjectView( R.id.connect_button ) Button mConnectButton;
 	@InjectView( R.id.server_button ) Button mServerButton;
-	@InjectView( R.id.msg_button ) Button mMsg;
+	//@InjectView( R.id.msg_button ) Button mMsg;
 	
 	public static BlueToothFragment newInstance( Bundle aArgs )
 	{
@@ -107,25 +107,25 @@ public class BlueToothFragment extends Fragment
 			}
 		});
         
-        mMsg.setOnClickListener( new OnClickListener()
-        {
-			
-			@Override
-			public void onClick(View v)
-			{
-//				if( mBtStarted )
-//				{
-					CentralActivity theCA = (CentralActivity)getActivity();
-				
-					byte[] theAr = {'a','b','c'};
-					theCA.sendMessage(theAr);
-//				}
-//				else
-//				{
-//					Toast.makeText(getActivity(), "Enable BT", Toast.LENGTH_SHORT ).show();
-//				}
-			}
-		});
+//        mMsg.setOnClickListener( new OnClickListener()
+//        {
+//			
+//			@Override
+//			public void onClick(View v)
+//			{
+////				if( mBtStarted )
+////				{
+//					CentralActivity theCA = (CentralActivity)getActivity();
+//				
+//					byte[] theAr = {'a','b','c'};
+//					theCA.sendMessage(theAr);
+////				}
+////				else
+////				{
+////					Toast.makeText(getActivity(), "Enable BT", Toast.LENGTH_SHORT ).show();
+////				}
+//			}
+//		});
         
         mServerButton.setOnClickListener( new OnClickListener()
         {
